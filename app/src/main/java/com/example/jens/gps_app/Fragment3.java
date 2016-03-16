@@ -62,6 +62,12 @@ public class Fragment3 extends Fragment {
                 .title("University of Mannheim")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
+        googleMap.addMarker(new MarkerOptions()
+                .anchor(0.0f, 1.0f) // Anchors the marker on the bottom left
+                .position(new LatLng(49.4799644, 8.4684448))
+                .title("Mannheim Bahnhof")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(49.484014, 8.462512)).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory
