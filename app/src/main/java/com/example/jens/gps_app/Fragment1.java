@@ -2,8 +2,6 @@ package com.example.jens.gps_app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -31,7 +29,7 @@ public class Fragment1 extends Fragment implements LocationListener {
     SqlManager db;
     ListView listView;
     String[] books_string_array;
-    List<Book> list;
+    List<Task> list;
     int Merker;
     private TextView latituteField;
     private TextView longitudeField;
@@ -99,7 +97,7 @@ public class Fragment1 extends Fragment implements LocationListener {
         db = new SqlManager(this.getContext());
 
         // get all books
-        list = db.getAllBooks();
+        list = db.getAllTasks();
         books_string_array = new String[list.size()];
 
         for (int i = 0; i < list.size(); i++) {

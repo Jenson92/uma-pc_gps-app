@@ -27,7 +27,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.1"
         android:gravity="center"
-        android:text="Welcome to the GPS Aided Task Service, called GATS. At the bottom you can see an overview of your tasks. Slide to the right to enter a new task. Slide to the third page to see the tasks on a map."
+        android:text="Welcome to the GPS Aided Task Service. At the bottom you can see an overview of your tasks. Slide to the right to enter a new task. Slide to the third page to see the tasks on a map."
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText

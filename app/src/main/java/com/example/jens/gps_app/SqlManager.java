@@ -13,27 +13,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class SqlManager extends SQLiteOpenHelper {
 
-    // Database Version
     private static final int DATABASE_VERSION = 1;
-    // Database Name
-    private static final String DATABASE_NAME = "BookDB";
-    /**
-     * CRUD operations (create "add", read "get", update, delete) book + get all books + delete all books
-     */
-
-    // Books table name
-    private static final String TABLE_BOOKS = "books";
-    // Books Table Columns names
+    private static final String DATABASE_NAME = "TaskDB";
+    private static final String TABLE_TASKS = "tasks";
     private static final String KEY_ID = "id";
     private static final String KEY_TITLE = "title";
-    //---------------------------------------------------------------------
-    private static final String KEY_AUTHOR = "author";
-    private static final String[] COLUMNS = {KEY_ID, KEY_TITLE, KEY_AUTHOR};
+    private static final String KEY_LAT = "lat";
+    private static final String KEY_LNG = "lng";
+    private static final String KEY_RANGE = "range";
+    private static final String KEY_DESC = "desc";
+    private static final String[] COLUMNS = {KEY_ID, KEY_TITLE, KEY_LAT, KEY_LNG, KEY_RANGE, KEY_DESC};
 
     public SqlManager(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,10 +35,13 @@ public class SqlManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // SQL statement to create book table
-        String CREATE_BOOK_TABLE = "CREATE TABLE books ( " +
+        String CREATE_BOOK_TABLE = "CREATE TABLE tasks ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "title TEXT, " +
-                "author TEXT )";
+                "lat DOUBLE, " +
+                "lng DOUBLE, " +
+                "range INTEGER, " +
+                "desc TEXT )";
 
         // create books table
         db.execSQL(CREATE_BOOK_TABLE);
@@ -53,25 +49,27 @@ public class SqlManager extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older books table if existed
-        db.execSQL("DROP TABLE IF EXISTS books");
 
-        // create fresh books table
+        db.execSQL("DROP TABLE IF EXISTS tasks");
         this.onCreate(db);
     }
 
-    public void addBook(Book book) {
-        Log.d("addBook", book.toString());
+    public void addTask(Task task) {
+        Log.d("addTask", task.toString());
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, book.getTitle()); // get title
-        values.put(KEY_AUTHOR, book.getAuthor()); // get author
+        values.put(KEY_TITLE, task.getTitle());
+        values.put(KEY_LAT, task.getLat());
+        values.put(KEY_LNG, task.getLng());
+        values.put(KEY_RANGE, task.getRange());
+        values.put(KEY_DESC, task.getDesc());
+
 
         // 3. insert
-        db.insert(TABLE_BOOKS, // table
+        db.insert(TABLE_TASKS, // table
                 null, //nullColumnHack
                 values); // key/value -> keys = column names/ values = column values
 
@@ -79,14 +77,14 @@ public class SqlManager extends SQLiteOpenHelper {
         db.close();
     }
 
-    public Book getBook(int id) {
+    public Task getTASK(int id) {
 
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
 
         // 2. build query
         Cursor cursor =
-                db.query(TABLE_BOOKS, // a. table
+                db.query(TABLE_TASKS, // a. table
                         COLUMNS, // b. column names
                         " id = ?", // c. selections
                         new String[]{String.valueOf(id)}, // d. selections args
@@ -99,65 +97,74 @@ public class SqlManager extends SQLiteOpenHelper {
         if (cursor != null)
             cursor.moveToFirst();
 
-        // 4. build book object
-        Book book = new Book();
-        book.setId(Integer.parseInt(cursor.getString(0)));
-        book.setTitle(cursor.getString(1));
-        book.setAuthor(cursor.getString(2));
+        // 4. build task object
+        Task task = new Task();
+        task.setId(Integer.parseInt(cursor.getString(0)));
+        task.setTitle(cursor.getString(1));
+        task.setLat(Double.parseDouble(cursor.getString(2)));
+        task.setLng(Double.parseDouble(cursor.getString(3)));
+        task.setRange(Integer.parseInt(cursor.getString(4)));
+        task.setDesc(cursor.getString(5));
 
-        Log.d("getBook(" + id + ")", book.toString());
+        Log.d("getTask(" + id + ")", task.toString());
 
-        // 5. return book
-        return book;
+        // 5. return task
+        return task;
     }
 
     // Get All Books
-    public List<Book> getAllBooks() {
-        List<Book> books = new LinkedList<Book>();
+    public List<Task> getAllTasks() {
+        List<Task> tasks = new LinkedList<Task>();
 
         // 1. build the query
-        String query = "SELECT  * FROM " + TABLE_BOOKS;
+        String query = "SELECT  * FROM " + TABLE_TASKS;
 
         // 2. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
-        // 3. go over each row, build book and add it to list
-        Book book = null;
+        // 3. go over each row, build task and add it to list
+        Task task = null;
         if (cursor.moveToFirst()) {
             do {
-                book = new Book();
-                book.setId(Integer.parseInt(cursor.getString(0)));
-                book.setTitle(cursor.getString(1));
-                book.setAuthor(cursor.getString(2));
+                task = new Task();
+                task.setId(Integer.parseInt(cursor.getString(0)));
+                task.setTitle(cursor.getString(1));
+                task.setLat(Double.parseDouble(cursor.getString(2)));
+                task.setLng(Double.parseDouble(cursor.getString(3)));
+                task.setRange(Integer.parseInt(cursor.getString(4)));
+                task.setDesc(cursor.getString(5));
 
-                // Add book to books
-                books.add(book);
+                // Add task to tasks
+                tasks.add(task);
             } while (cursor.moveToNext());
         }
 
-        Log.d("getAllBooks()", books.toString());
+        Log.d("getAllTasks()", tasks.toString());
 
-        // return books
-        return books;
+        // return tasks
+        return tasks;
     }
 
-    // Updating single book
-    public int updateBook(Book book) {
+    // Updating single task
+    public int updateBook(Task task) {
 
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
-        values.put("title", book.getTitle()); // get title
-        values.put("author", book.getAuthor()); // get author
+        values.put("title", task.getTitle());
+        values.put("lat", task.getLat());
+        values.put("lng", task.getLng());
+        values.put("range", task.getRange());
+        values.put("desc", task.getDesc());
 
         // 3. updating row
-        int i = db.update(TABLE_BOOKS, //table
+        int i = db.update(TABLE_TASKS, //table
                 values, // column/value
                 KEY_ID + " = ?", // selections
-                new String[]{String.valueOf(book.getId())}); //selection args
+                new String[]{String.valueOf(task.getId())}); //selection args
 
         // 4. close
         db.close();
@@ -166,21 +173,21 @@ public class SqlManager extends SQLiteOpenHelper {
 
     }
 
-    // Deleting single book
-    public void deleteBook(Book book) {
+    // Deleting single task
+    public void deleteBook(Task task) {
 
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 2. delete
-        db.delete(TABLE_BOOKS,
+        db.delete(TABLE_TASKS,
                 KEY_ID + " = ?",
-                new String[]{String.valueOf(book.getId())});
+                new String[]{String.valueOf(task.getId())});
 
         // 3. close
         db.close();
 
-        Log.d("deleteBook", book.toString());
+        Log.d("deleteTask", task.toString());
 
     }
 }
