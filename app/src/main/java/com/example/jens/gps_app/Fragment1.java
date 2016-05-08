@@ -1,6 +1,7 @@
 package com.example.jens.gps_app;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -9,15 +10,21 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -30,27 +37,24 @@ public class Fragment1 extends Fragment implements LocationListener {
     ListView listView;
     String[] books_string_array;
     List<Task> list;
-    int Merker;
-    private TextView latituteField;
-    private TextView longitudeField;
+    int merker = 1;
+
+    private long lat;
+    private long lng;
+
+
     private LocationManager locationManager;
     private String provider;
 
     public Fragment1() {
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        System.out.println("Hallo Beginn");
 
         View rootView = inflater.inflate(R.layout.fragment_1, container, false);
-
-        latituteField = (TextView) rootView.findViewById(R.id.TextView02);
-        longitudeField = (TextView) rootView.findViewById(R.id.TextView04);
-
 
         LocationManager service = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         boolean enabled = service
@@ -77,7 +81,6 @@ public class Fragment1 extends Fragment implements LocationListener {
 
         String permission = "android.permission.INTERNET";
         int res = getContext().checkCallingOrSelfPermission(permission);
-        System.out.println("Test " + res);
 
         Location location = locationManager.getLastKnownLocation(provider);
 
@@ -85,27 +88,62 @@ public class Fragment1 extends Fragment implements LocationListener {
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);
-        } else {
-            latituteField.setText("Location not available");
-            longitudeField.setText("Location not available");
         }
-
-
-        Merker = 1;
-
 
         db = new SqlManager(this.getContext());
 
-        // get all books
-        list = db.getAllTasks();
-        books_string_array = new String[list.size()];
+        // get all tasks
 
-        for (int i = 0; i < list.size(); i++) {
-            books_string_array[i] = list.get(i).getTitle();
-        }
+        tasks_laden();
+
+
+
+
 
         // Get ListView object from xml
         listView = (ListView) rootView.findViewById(R.id.listView1);
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                    long arg3) {
+
+
+                Location taskLocation = new Location("point A");
+                taskLocation.setLatitude(list.get(position).getLat());
+                taskLocation.setLongitude(list.get(position).getLng());
+
+                Location currentLocation = new Location("point B");
+                currentLocation.setLatitude(lat);
+                currentLocation.setLongitude(lng);
+
+                float distance = taskLocation.distanceTo(currentLocation);
+
+                //Detail Dialog
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Task Details")
+                        .setMessage("Title: " + list.get(position).getTitle() + "\n" + "Description: " + list.get(position).getDesc() + "\n" + "Range: " + list.get(position).getRange() + " m" + "\n" + "Distance: " + distance + " m")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+
+                            }
+                        })
+
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .show();
+
+            }
+
+
+            // assuming string and if you want to get the value on click of list item
+            // do what you intend to do on click of listview row
+
+        });
+
+
 
         // Define a new Adapter
         // First parameter - Context
@@ -113,58 +151,79 @@ public class Fragment1 extends Fragment implements LocationListener {
         // Third parameter - ID of the TextView to which the data is written
         // Forth - the Array of data
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getContext(),
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, books_string_array);
-
 
         // Assign adapter to ListView
         listView.setAdapter(adapter);
-
-
-        // ListView Item Click Listener
-        /*
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-            }
-
-        });
-        */
-
 
         delete_button = (Button) rootView.findViewById(R.id.delete_button);
         delete_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                if (merker == 1) {
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                        android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, books_string_array);
-                listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                            android.R.layout.simple_list_item_multiple_choice, android.R.id.text1, books_string_array);
+                    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                    listView.setAdapter(adapter);
 
-                listView.setAdapter(adapter);
+                    merker = 2;
 
-                if (Merker == 1) {
-                    System.out.println("Merker: " + Merker);
-                    Intent myIntent = new Intent(getActivity(), GPS_Service.class);
-                    myIntent.putExtra("test", "Hallo Welt");
-                    myIntent.putExtra("tasklist", books_string_array);
-                    getActivity().startService(myIntent);
-                    Merker = 2;
                 } else {
-                    System.out.println("Merker: " + Merker);
-                    getActivity().stopService(new Intent(getActivity(), GPS_Service.class));
-                    Merker = 1;
+
+                    merker = 1;
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Delete")
+                            .setMessage("Do you want to delete this task?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    // positiv
+
+                                    //delete
+
+                                    System.out.println("Markierte Elemente: " + listView.getCheckedItemPositions());
+
+                                    for (int i = 0; i < listView.getCheckedItemPositions().size(); i++) {
+                                        int key = listView.getCheckedItemPositions().keyAt(i);
+                                        // get the object by the key..
+                                        System.out.println("Markierte Elemente Test: " + key);
+
+                                        System.out.println("Markierter Titel: " + list.get(key).getTitle());
+
+                                        db.deleteBook(list.get(key));
+
+                                        tasks_laden();
+
+                                    }
+
+                                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                                            android.R.layout.simple_list_item_1, android.R.id.text1, books_string_array);
+                                    listView.setAdapter(adapter);
+
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // negativ
+
+                                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                                            android.R.layout.simple_list_item_1, android.R.id.text1, books_string_array);
+                                    listView.setAdapter(adapter);
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
                 }
 
-                // Perform action on click
 
+                // Perform action on click
             }
         });
 
-
+        System.out.println("Task Size: " + db.getAllTasks().size());
 
         return rootView;
 
@@ -186,10 +245,8 @@ public class Fragment1 extends Fragment implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        long lat = (long) (location.getLatitude());
-        long lng = (long) (location.getLongitude());
-        latituteField.setText(String.valueOf(lat));
-        longitudeField.setText(String.valueOf(lng));
+        lat = (long) (location.getLatitude());
+        lng = (long) (location.getLongitude());
     }
 
     @Override
@@ -202,7 +259,6 @@ public class Fragment1 extends Fragment implements LocationListener {
     public void onProviderEnabled(String provider) {
         Toast.makeText(getActivity(), "Enabled new provider " + provider,
                 Toast.LENGTH_SHORT).show();
-
     }
 
     @Override
@@ -210,6 +266,14 @@ public class Fragment1 extends Fragment implements LocationListener {
         Toast.makeText(getActivity(), "Disabled provider " + provider,
                 Toast.LENGTH_SHORT).show();
     }
+
+
+    public void tasks_laden() {
+        list = db.getAllTasks();
+        books_string_array = new String[list.size()];
+
+        for (int i = 0; i < list.size(); i++) {
+            books_string_array[i] = list.get(i).getTitle();
+        }
+    }
 }
-
-

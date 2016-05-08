@@ -54,6 +54,7 @@ public class SqlManager extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
+
     public void addTask(Task task) {
         Log.d("addTask", task.toString());
         // 1. get reference to writable DB
@@ -101,8 +102,13 @@ public class SqlManager extends SQLiteOpenHelper {
         Task task = new Task();
         task.setId(Integer.parseInt(cursor.getString(0)));
         task.setTitle(cursor.getString(1));
+
+        System.out.println("Task 2 auslesen: " + (cursor.getString(2)));
         task.setLat(Double.parseDouble(cursor.getString(2)));
+
+        System.out.println("Task 3 auslesen: " + (cursor.getString(3)));
         task.setLng(Double.parseDouble(cursor.getString(3)));
+
         task.setRange(Integer.parseInt(cursor.getString(4)));
         task.setDesc(cursor.getString(5));
 

@@ -33,4 +33,12 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <fragment
+        android:id="@+id/fragment2"
+        android:name="com.example.jens.gps_app.Fragment2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+
 </android.support.design.widget.CoordinatorLayout>

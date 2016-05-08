@@ -1,5 +1,6 @@
 package com.example.jens.gps_app;
 
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -19,7 +20,9 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.maps.model.LatLng;
+
+public class MainActivity extends AppCompatActivity implements Fragment3.longClick {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -29,16 +32,39 @@ public class MainActivity extends AppCompatActivity {
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    public SectionsPagerAdapter mSectionsPagerAdapter;
+
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    public ViewPager mViewPager;
+
+
+    @Override
+    public void sendPoint(LatLng point) {
+
+        mViewPager.setCurrentItem(1, true);
+        // Get Fragment B
+        System.out.println("Test2");
+
+        Fragment2 frag = (Fragment2)
+                getSupportFragmentManager().findFragmentById(R.id.fragment2);
+        frag.getLocationPoint(point);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent myIntent = new Intent(this, GPS_Service.class);
+        myIntent.putExtra("test", "Hallo Welt");
+        //myIntent.putExtra("tasklist", books_string_array);
+        this.startService(myIntent);
+
+
+
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -51,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-    }
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -23,6 +23,7 @@ public class Task {
         this.lng = lng;
         this.range = range;
         this.desc = desc;
+        System.out.println("Im Konstruktor: " + this.title + this.lat + this.lng + this.range + this.desc);
     }
 
     public int getId() {
@@ -50,7 +51,7 @@ public class Task {
     }
 
     public double getLng() {
-        return lat;
+        return lng;
     }
 
     public void setLng(double lng) {

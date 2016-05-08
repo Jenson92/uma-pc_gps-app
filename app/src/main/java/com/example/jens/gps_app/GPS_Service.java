@@ -21,42 +21,18 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class GPS_Service extends Service implements LocationListener {
-    final static String ACTION = "NotifyServiceAction";
-    final static String STOP_SERVICE_BROADCAST_KEY = "StopServiceBroadcastKey";
-    final static int RQS_STOP_SERVICE = 1;
     private static Timer timer = new Timer();
-    private final String myBlog = "http://www.cs.dartmouth.edu/~campbell/cs65/cs65.html";
     String[] tasklist;
     int merker = 0;
     double lat;
     double lng;
-    private final Handler toastHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (merker >= tasklist.length) {
-                merker = 0;
-            }
-
-            Toast.makeText(getApplicationContext(), tasklist[merker], Toast.LENGTH_SHORT).show();
-
-            Toast.makeText(getApplicationContext(), lat + " : " + lng, Toast.LENGTH_SHORT).show();
-
-
-            merker++;
-
-
-            if (merker == 4) {
-                System.out.println("Start Notification, Merker: " + merker);
-                notification_Test();
-            }
-
-
-        }
-    };
+    SqlManager db;
+    List<Task> myList;
     private Context ctx;
     private LocationManager locationManager;
     private String provider;
@@ -68,6 +44,8 @@ public class GPS_Service extends Service implements LocationListener {
 
     @Override
     public void onCreate() {
+        db = new SqlManager(this);
+
         super.onCreate();
         Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
 
@@ -90,7 +68,7 @@ public class GPS_Service extends Service implements LocationListener {
 
         Location location = locationManager.getLastKnownLocation(provider);
 
-        locationManager.requestLocationUpdates(provider, 400, 1, this);
+        locationManager.requestLocationUpdates(provider, 5000, 1, this);
 
     }
 
@@ -109,19 +87,43 @@ public class GPS_Service extends Service implements LocationListener {
             tasklist = intent.getStringArrayExtra("tasklist");
         }
         Toast.makeText(this, "Service started " + test, Toast.LENGTH_LONG).show();
-        startService();
-    }
-
-    private void startService() {
-        timer.scheduleAtFixedRate(new mainTask(), 0, 5000);
     }
 
     @Override
     public void onLocationChanged(Location location) {
+
+        System.out.println("Innerhalb Location Update");
+
         lat = (double) (location.getLatitude());
         lng = (double) (location.getLongitude());
-        // Toast.makeText()
 
+        System.out.println("AllTasks " + db.getAllTasks());
+
+        for (int i = 0; i < db.getAllTasks().size(); i++) {
+
+            db.getAllTasks().get(i).getLat();
+            db.getAllTasks().get(i).getLng();
+
+            Location taskLocation = new Location("point A");
+            taskLocation.setLatitude(db.getAllTasks().get(i).getLat());
+            taskLocation.setLongitude(db.getAllTasks().get(i).getLng());
+
+            Location currentLocation = new Location("point B");
+            currentLocation.setLatitude(lat);
+            currentLocation.setLongitude(lng);
+
+            float distance = taskLocation.distanceTo(currentLocation);
+            System.out.println("Distanz zu Task " + db.getAllTasks().get(i).getTitle() + " : " + distance);
+            System.out.println("Range: " + db.getAllTasks().get(i).getRange());
+
+            if (distance < db.getAllTasks().get(i).getRange()) {
+                notification_Test(db.getAllTasks().get(i).getTitle());
+            }
+
+            Toast.makeText(this, "Distanz zu Task " + db.getAllTasks().get(i).getTitle() + " : " + distance, Toast.LENGTH_SHORT);
+
+
+        }
     }
 
     @Override
@@ -136,10 +138,9 @@ public class GPS_Service extends Service implements LocationListener {
     public void onProviderDisabled(String provider) {
     }
 
-    public void notification_Test() {
+    public void notification_Test(String taskTitle) {
 
         System.out.println("Innerhalb von notification");
-
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -152,24 +153,14 @@ public class GPS_Service extends Service implements LocationListener {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
+                        .setContentTitle("GPS-App")
+                        .setContentText("In range of " + taskTitle);
 
         int mNotificationId = 001;
 
         NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
         mBuilder.setContentIntent(resultPendingIntent);
         mNotifyMgr.notify(mNotificationId, mBuilder.build());
 
     }
-
-    private class mainTask extends TimerTask {
-        public void run() {
-            toastHandler.sendEmptyMessage(0);
-
-
-        }
-    }
-
 }

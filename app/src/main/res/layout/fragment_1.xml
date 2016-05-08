@@ -16,11 +16,6 @@
         android:text="Start"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <EditText
-        android:id="@+id/TextView02"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
@@ -29,11 +24,6 @@
         android:gravity="center"
         android:text="Welcome to the GPS Aided Task Service. At the bottom you can see an overview of your tasks. Slide to the right to enter a new task. Slide to the third page to see the tasks on a map."
         android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <EditText
-        android:id="@+id/TextView04"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/textView"
