@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements Fragment3.longCli
 
         mViewPager.setCurrentItem(1, true);
         // Get Fragment B
-        System.out.println("Test2");
 
         Fragment2 frag = (Fragment2)
                 getSupportFragmentManager().findFragmentById(R.id.fragment2);
@@ -62,9 +61,6 @@ public class MainActivity extends AppCompatActivity implements Fragment3.longCli
         myIntent.putExtra("test", "Hallo Welt");
         //myIntent.putExtra("tasklist", books_string_array);
         this.startService(myIntent);
-
-
-
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

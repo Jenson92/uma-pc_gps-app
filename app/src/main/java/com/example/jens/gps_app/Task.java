@@ -23,7 +23,6 @@ public class Task {
         this.lng = lng;
         this.range = range;
         this.desc = desc;
-        System.out.println("Im Konstruktor: " + this.title + this.lat + this.lng + this.range + this.desc);
     }
 
     public int getId() {

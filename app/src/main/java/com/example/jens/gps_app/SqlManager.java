@@ -1,9 +1,5 @@
 package com.example.jens.gps_app;
 
-/**
- * Created by Jens on 04.04.2016.
- */
-
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.LinkedList;
@@ -35,7 +31,7 @@ public class SqlManager extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // SQL statement to create book table
-        String CREATE_BOOK_TABLE = "CREATE TABLE tasks ( " +
+        String CREATE_TASK_TABLE = "CREATE TABLE tasks ( " +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "title TEXT, " +
                 "lat DOUBLE, " +
@@ -44,19 +40,18 @@ public class SqlManager extends SQLiteOpenHelper {
                 "desc TEXT )";
 
         // create books table
-        db.execSQL(CREATE_BOOK_TABLE);
+        db.execSQL(CREATE_TASK_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         db.execSQL("DROP TABLE IF EXISTS tasks");
         this.onCreate(db);
     }
 
-
     public void addTask(Task task) {
         Log.d("addTask", task.toString());
+
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -67,7 +62,6 @@ public class SqlManager extends SQLiteOpenHelper {
         values.put(KEY_LNG, task.getLng());
         values.put(KEY_RANGE, task.getRange());
         values.put(KEY_DESC, task.getDesc());
-
 
         // 3. insert
         db.insert(TABLE_TASKS, // table
@@ -102,13 +96,8 @@ public class SqlManager extends SQLiteOpenHelper {
         Task task = new Task();
         task.setId(Integer.parseInt(cursor.getString(0)));
         task.setTitle(cursor.getString(1));
-
-        System.out.println("Task 2 auslesen: " + (cursor.getString(2)));
         task.setLat(Double.parseDouble(cursor.getString(2)));
-
-        System.out.println("Task 3 auslesen: " + (cursor.getString(3)));
         task.setLng(Double.parseDouble(cursor.getString(3)));
-
         task.setRange(Integer.parseInt(cursor.getString(4)));
         task.setDesc(cursor.getString(5));
 
@@ -176,7 +165,6 @@ public class SqlManager extends SQLiteOpenHelper {
         db.close();
 
         return i;
-
     }
 
     // Deleting single task

@@ -36,7 +36,6 @@ public class Fragment3 extends Fragment implements GoogleMap.OnMapLongClickListe
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume();// needed to get the map to display immediately
 
-
         db = new SqlManager(this.getContext());
 
         try {
@@ -53,16 +52,11 @@ public class Fragment3 extends Fragment implements GoogleMap.OnMapLongClickListe
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
                 this.getContext().getPackageName());
 
-        System.out.println("Permission: " + hasPerm);
-
         if (hasPerm != PackageManager.PERMISSION_GRANTED) {
-
             // do stuff
         }
 
         googleMap.setMyLocationEnabled(true);
-
-        System.out.println("jojojo: " + db.getAllTasks().size());
 
         for (int i = 0; i < db.getAllTasks().size(); i++) {
 
@@ -78,10 +72,7 @@ public class Fragment3 extends Fragment implements GoogleMap.OnMapLongClickListe
         googleMap.animateCamera(CameraUpdateFactory
                 .newCameraPosition(cameraPosition));
 
-
         googleMap.setOnMapLongClickListener(this);
-
-
 
         return v;
     }
@@ -123,18 +114,10 @@ public class Fragment3 extends Fragment implements GoogleMap.OnMapLongClickListe
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-
-                        System.out.println("Test1");
-
-
+                        // positiv
                         MainActivity mApp = ((MainActivity) getContext());
                         mApp.mViewPager.setCurrentItem(1, true);
-
-
                         someMethod(point2);
-
-
-                        // positiv
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

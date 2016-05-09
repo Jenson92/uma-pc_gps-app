@@ -15,25 +15,15 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class GPS_Service extends Service implements LocationListener {
-    private static Timer timer = new Timer();
     String[] tasklist;
-    int merker = 0;
     double lat;
     double lng;
     SqlManager db;
-    List<Task> myList;
-    private Context ctx;
     private LocationManager locationManager;
     private String provider;
 
@@ -47,7 +37,7 @@ public class GPS_Service extends Service implements LocationListener {
         db = new SqlManager(this);
 
         super.onCreate();
-        Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service created", Toast.LENGTH_LONG).show();
 
         LocationManager service = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean enabled = service
@@ -64,7 +54,6 @@ public class GPS_Service extends Service implements LocationListener {
 
         String permission = "android.permission.INTERNET";
         int res = checkCallingOrSelfPermission(permission);
-        System.out.println("Test " + res);
 
         Location location = locationManager.getLastKnownLocation(provider);
 
@@ -75,7 +64,7 @@ public class GPS_Service extends Service implements LocationListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "Service destroyed", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service destroyed", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -86,18 +75,14 @@ public class GPS_Service extends Service implements LocationListener {
             test = intent.getStringExtra("test");
             tasklist = intent.getStringArrayExtra("tasklist");
         }
-        Toast.makeText(this, "Service started " + test, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Service started " + test, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onLocationChanged(Location location) {
 
-        System.out.println("Innerhalb Location Update");
-
         lat = (double) (location.getLatitude());
         lng = (double) (location.getLongitude());
-
-        System.out.println("AllTasks " + db.getAllTasks());
 
         for (int i = 0; i < db.getAllTasks().size(); i++) {
 
@@ -113,16 +98,10 @@ public class GPS_Service extends Service implements LocationListener {
             currentLocation.setLongitude(lng);
 
             float distance = taskLocation.distanceTo(currentLocation);
-            System.out.println("Distanz zu Task " + db.getAllTasks().get(i).getTitle() + " : " + distance);
-            System.out.println("Range: " + db.getAllTasks().get(i).getRange());
 
             if (distance < db.getAllTasks().get(i).getRange()) {
                 notification_Test(db.getAllTasks().get(i).getTitle());
             }
-
-            Toast.makeText(this, "Distanz zu Task " + db.getAllTasks().get(i).getTitle() + " : " + distance, Toast.LENGTH_SHORT);
-
-
         }
     }
 
@@ -140,7 +119,6 @@ public class GPS_Service extends Service implements LocationListener {
 
     public void notification_Test(String taskTitle) {
 
-        System.out.println("Innerhalb von notification");
         Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

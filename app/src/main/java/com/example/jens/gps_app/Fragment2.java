@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.text.DecimalFormat;
-
 /**
  * Created by Jens on 10.03.2016.
  */
@@ -51,7 +49,7 @@ public class Fragment2 extends Fragment {
         add_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                System.out.println(task_title.getText().toString() + " " + Double.parseDouble(lat_text.getText().toString()) + " " + Double.parseDouble(lng_text.getText().toString()) + " " + Integer.parseInt(task_range.getText().toString()) + " " + task_desc.getText().toString());
+                //System.out.println(task_title.getText().toString() + " " + Double.parseDouble(lat_text.getText().toString()) + " " + Double.parseDouble(lng_text.getText().toString()) + " " + Integer.parseInt(task_range.getText().toString()) + " " + task_desc.getText().toString());
 
 
                 db.addTask(new Task(task_title.getText().toString(), Double.parseDouble(lat_text.getText().toString()), Double.parseDouble(lng_text.getText().toString()), Integer.parseInt(task_range.getText().toString()), task_desc.getText().toString()));
@@ -64,19 +62,15 @@ public class Fragment2 extends Fragment {
                 MainActivity mApp = ((MainActivity) getContext());
                 mApp.mViewPager.setCurrentItem(2, true);
                 mApp.mViewPager.setCurrentItem(0, true);
-
-                // Perform action on click
-
             }
         });
 
         location_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-
                 new AlertDialog.Builder(getContext())
                         .setTitle("Enter location")
-                        .setMessage("Click yes for enter from a map or abort to enter from a list")
+                        .setMessage("Click yes for enter from a map")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
 
@@ -100,14 +94,9 @@ public class Fragment2 extends Fragment {
     }
 
     public void getLocationPoint(LatLng point) {
-        System.out.println("in getLocationPoint");
-        System.out.println("Lat: " + point.latitude);
-        System.out.println("Lng: " + point.longitude);
-
         lat_text.setText(String.valueOf(point.latitude));
         lng_text.setText(String.valueOf(point.longitude));
     }
-
 }
 
 

@@ -10,7 +10,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +17,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -86,7 +81,6 @@ public class Fragment1 extends Fragment implements LocationListener {
 
         // Initialize the location fields
         if (location != null) {
-            System.out.println("Provider " + provider + " has been selected.");
             onLocationChanged(location);
         }
 
@@ -95,9 +89,6 @@ public class Fragment1 extends Fragment implements LocationListener {
         // get all tasks
 
         tasks_laden();
-
-
-
 
 
         // Get ListView object from xml
@@ -144,7 +135,6 @@ public class Fragment1 extends Fragment implements LocationListener {
         });
 
 
-
         // Define a new Adapter
         // First parameter - Context
         // Second parameter - Layout for the row
@@ -178,24 +168,12 @@ public class Fragment1 extends Fragment implements LocationListener {
                             .setMessage("Do you want to delete this task?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-
                                     // positiv
-
                                     //delete
-
-                                    System.out.println("Markierte Elemente: " + listView.getCheckedItemPositions());
-
                                     for (int i = 0; i < listView.getCheckedItemPositions().size(); i++) {
                                         int key = listView.getCheckedItemPositions().keyAt(i);
-                                        // get the object by the key..
-                                        System.out.println("Markierte Elemente Test: " + key);
-
-                                        System.out.println("Markierter Titel: " + list.get(key).getTitle());
-
                                         db.deleteBook(list.get(key));
-
                                         tasks_laden();
-
                                     }
 
                                     final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
@@ -222,8 +200,6 @@ public class Fragment1 extends Fragment implements LocationListener {
                 // Perform action on click
             }
         });
-
-        System.out.println("Task Size: " + db.getAllTasks().size());
 
         return rootView;
 
@@ -257,14 +233,14 @@ public class Fragment1 extends Fragment implements LocationListener {
 
     @Override
     public void onProviderEnabled(String provider) {
-        Toast.makeText(getActivity(), "Enabled new provider " + provider,
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Enabled new provider " + provider,
+        //       Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        Toast.makeText(getActivity(), "Disabled provider " + provider,
-                Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getActivity(), "Disabled provider " + provider,
+        //         Toast.LENGTH_SHORT).show();
     }
 
 
